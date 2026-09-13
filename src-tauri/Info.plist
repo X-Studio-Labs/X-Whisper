@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <!-- Hide the app from the Dock so it lives only in the menu bar tray -->
+    <key>LSUIElement</key>
+    <true/>
+    <!-- Required for microphone access — without this the permission dialog
+         is skipped and the app silently records zero audio samples -->
+    <key>NSMicrophoneUsageDescription</key>
+    <string>X-Whisper records audio to transcribe your speech. Recording only happens while the hotkey is held.</string>
+    <!-- Required for osascript-based paste (Accessibility) -->
+    <key>NSAppleEventsUsageDescription</key>
+    <string>X-Whisper uses AppleScript to paste transcribed text into the active app.</string>
+</dict>
+</plist>

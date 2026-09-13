@@ -1,0 +1,21 @@
+# X-Whisper Python Engine Dependencies
+
+# Core
+websockets>=12.0
+psutil>=5.9.0
+numpy>=1.24.0
+
+# Audio Pipeline (Phase 1)
+sounddevice>=0.5.0
+scipy>=1.10.0
+
+# Local STT runs through the bundled whisper.cpp `whisper-cli` binary
+# (see binaries/whisper-cpp/) spawned as a subprocess — no Python ML
+# stack needed, no torch, no CTranslate2. Model weights download via
+# huggingface_hub, which was previously pulled in transitively by
+# faster-whisper; now declared explicitly.
+huggingface_hub>=0.23
+
+# Cloud ASR + credentials (Phase 12)
+groq>=0.9.0
+keyring>=24.0

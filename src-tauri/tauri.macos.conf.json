@@ -1,0 +1,19 @@
+{
+  "bundle": {
+    "resources": [
+      "../python-engine/*.py",
+      "../python-engine/*.sh",
+      "../python-engine/requirements.txt",
+      "../python-engine/providers/*.py",
+      "../python-engine/providers/__init__.py",
+      "../binaries/whisper-cpp/metal/whisper-cli",
+      "../binaries/ffmpeg/ffmpeg"
+    ],
+    "macOS": {
+      "minimumSystemVersion": "13.0",
+      "signingIdentity": null,
+      "entitlements": null,
+      "infoPlist": "Info.plist"
+    }
+  }
+}

@@ -1,0 +1,38 @@
+[package]
+name = "x-whisper"
+version = "1.0.0"
+description = "Speech-to-Text Desktop App powered by Whisper AI"
+authors = ["X-Studio"]
+license = "MIT"
+homepage = "https://x-studio.live"
+repository = "https://github.com/X-Studio-Labs/X-Whisper"
+edition = "2021"
+
+[lib]
+name = "x_whisper_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = ["tray-icon", "image-png", "macos-private-api"] }
+tauri-plugin-opener = "2"
+tauri-plugin-global-shortcut = "2"
+tauri-plugin-dialog = "2"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+enigo = "0.2"
+
+[target.'cfg(windows)'.dependencies]
+windows-sys = { version = "0.59", features = [
+    "Win32_Foundation",
+    "Win32_Security",
+    "Win32_System_JobObjects",
+    "Win32_System_Threading",
+    "Win32_UI_WindowsAndMessaging",
+] }
+
+[target.'cfg(target_os = "macos")'.dependencies]
+cocoa = "0.26"
+objc = "0.2"

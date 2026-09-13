@@ -1,0 +1,63 @@
+name: CI
+
+# Fast checks on every push / PR: TypeScript, Rust type-check, Python
+# byte-compile. The full installer build lives in build-windows.yml and
+# is triggered manually because it takes ~30 min (Vulkan SDK + CUDA zip).
+on:
+  push:
+    branches: [master, main]
+  pull_request:
+    branches: [master, main]
+
+jobs:
+  frontend:
+    name: TypeScript + Vite
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - run: npm ci
+      - run: npm run build
+
+  engine:
+    name: Python engine
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m compileall -q python-engine
+
+  rust:
+    name: Rust (cargo check)
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - run: npm ci
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri
+      # tauri-build verifies every bundle.resources path exists. The real
+      # binaries are ~350 MB and not needed for a type-check, so stub them.
+      - name: Stub bundled binaries
+        shell: pwsh
+        run: |
+          foreach ($d in 'cpu','cuda','vulkan') {
+            New-Item -ItemType Directory -Force "binaries/whisper-cpp/$d" | Out-Null
+            Set-Content "binaries/whisper-cpp/$d/whisper-cli.exe" ''
+            Set-Content "binaries/whisper-cpp/$d/stub.dll" ''
+          }
+          New-Item -ItemType Directory -Force binaries/ffmpeg | Out-Null
+          Set-Content binaries/ffmpeg/ffmpeg.exe ''
+      - name: cargo check
+        working-directory: src-tauri
+        run: cargo check --locked

@@ -1,0 +1,133 @@
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ========================================
+   X-Whisper Global Styles
+   ======================================== */
+
+:root {
+  --island-bg: rgba(10, 10, 10, 0.85);
+  --island-border: rgba(255, 255, 255, 0.08);
+  --island-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+  --recording-red: #FF3B30;
+  --waveform-green: #30D158;
+  --accent-blue: #0A84FF;
+  --surface-dark: #1C1C1E;
+  --surface-darker: #0A0A0A;
+  --text-primary: #FFFFFF;
+  --text-secondary: rgba(255, 255, 255, 0.6);
+  --text-muted: rgba(255, 255, 255, 0.35);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  background: transparent;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Island window — fully transparent, no scrolling */
+body.island-window {
+  background: transparent;
+  -webkit-app-region: no-drag;
+  overflow: hidden;
+}
+
+html:has(body.island-window) {
+  overflow: hidden;
+}
+
+/* Settings window — dark background, scrollable */
+body.settings-window {
+  background: var(--surface-darker);
+  overflow-y: auto;
+}
+
+html:has(body.settings-window) {
+  overflow-y: auto;
+}
+
+/* Onboarding window — transparent background for the morphing card */
+body.onboarding-window {
+  background: transparent;
+  overflow: hidden;
+}
+
+html:has(body.onboarding-window) {
+  overflow: hidden;
+  background: transparent;
+}
+
+/* Glow pulse animation for onboarding splash logo */
+@keyframes glow-pulse {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.3), 0 0 60px rgba(147, 51, 234, 0.15);
+  }
+  50% {
+    box-shadow: 0 0 40px rgba(59, 130, 246, 0.5), 0 0 80px rgba(147, 51, 234, 0.3);
+  }
+}
+
+.animate-glow-pulse {
+  animation: glow-pulse 2s ease-in-out infinite;
+}
+
+/* ========================================
+   Utility Classes
+   ======================================== */
+
+.glass {
+  background: var(--island-bg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--island-border);
+}
+
+.text-gradient {
+  background: linear-gradient(135deg, #FFFFFF 0%, rgba(255, 255, 255, 0.7) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Settings card — reusable container for settings sections */
+.settings-card {
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.02);
+  padding: 16px;
+  transition: background-color 0.15s ease;
+}
+
+.settings-card:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.25);
+}

@@ -1,0 +1,110 @@
+name: Build Windows
+
+# Full installer build (~30 min: Vulkan SDK install + CUDA zip). Runs on
+# version tags to produce a draft release, or on demand. Day-to-day checks
+# are in ci.yml.
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+env:
+  PYTHON_VERSION: '3.12'
+  NODE_VERSION: '20'
+  VULKAN_SDK_VERSION: '1.3.280.0'
+  WHISPER_CPP_VERSION: 'v1.8.4'
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install frontend dependencies
+        run: npm ci
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Rust cache
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri
+
+      # --- whisper.cpp binary prep -----------------------------------
+      # Upstream ships prebuilt CPU + cuBLAS zips but no Windows Vulkan
+      # binary, so Vulkan must be built from source. The binaries/ tree
+      # is cached across runs because (a) the CUDA zip is ~436 MB and
+      # (b) the Vulkan build can take several minutes on CI runners.
+      - name: Cache whisper.cpp binaries
+        id: cache-whisper-cpp
+        uses: actions/cache@v4
+        with:
+          path: binaries/whisper-cpp
+          key: whisper-cpp-${{ env.WHISPER_CPP_VERSION }}-vk-${{ env.VULKAN_SDK_VERSION }}-${{ hashFiles('build/fetch-whisper-cpp.ps1', 'build/build-whisper-cpp-vulkan.ps1') }}
+
+      - name: Fetch CPU + CUDA binaries
+        if: steps.cache-whisper-cpp.outputs.cache-hit != 'true'
+        shell: pwsh
+        run: ./build/fetch-whisper-cpp.ps1 -Version ${{ env.WHISPER_CPP_VERSION }}
+
+      - name: Install Vulkan SDK
+        if: steps.cache-whisper-cpp.outputs.cache-hit != 'true'
+        shell: pwsh
+        run: |
+          $Version = "${{ env.VULKAN_SDK_VERSION }}"
+          $InstallDir = "C:\VulkanSDK\$Version"
+          $Installer = Join-Path $env:TEMP "VulkanSDK-$Version-Installer.exe"
+          $Url = "https://sdk.lunarg.com/sdk/download/$Version/windows/VulkanSDK-$Version-Installer.exe"
+          Write-Host "Downloading $Url"
+          Invoke-WebRequest -Uri $Url -OutFile $Installer -UseBasicParsing
+          Write-Host "Installing to $InstallDir (silent) ..."
+          Start-Process -Wait -FilePath $Installer -ArgumentList `
+            "--root", $InstallDir, `
+            "--accept-licenses", "--default-answer", "--confirm-command", "install"
+          "VULKAN_SDK=$InstallDir" | Out-File -Append -Encoding utf8 -FilePath $env:GITHUB_ENV
+          "$InstallDir\Bin" | Out-File -Append -Encoding utf8 -FilePath $env:GITHUB_PATH
+
+      - name: Build Vulkan backend from source
+        if: steps.cache-whisper-cpp.outputs.cache-hit != 'true'
+        shell: pwsh
+        run: ./build/build-whisper-cpp-vulkan.ps1 -Version ${{ env.WHISPER_CPP_VERSION }}
+
+      # --- Tauri build -----------------------------------------------
+      # The Python engine ships as source .py files (see
+      # tauri.conf.json → bundle.resources), spawned under a managed
+      # Python 3.12 runtime installed on first launch — no PyInstaller
+      # step is needed here.
+      - name: Build Tauri app
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tagName: v__VERSION__
+          releaseName: 'X-Whisper v__VERSION__'
+          releaseBody: 'See the changelog for details.'
+          releaseDraft: true
+          prerelease: false
+
+      - name: Upload artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: x-whisper-windows
+          path: |
+            src-tauri/target/release/bundle/nsis/*.exe
+            src-tauri/target/release/bundle/msi/*.msi
+          retention-days: 30

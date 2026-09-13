@@ -1,0 +1,66 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Dependencies
+node_modules
+
+# Build output
+dist
+dist-ssr
+*.local
+
+# Rust / Tauri
+target/
+src-tauri/target/
+
+# Python
+**/__pycache__/
+*.pyc
+python-engine/.venv/
+*.egg-info/
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# OS
+Thumbs.db
+Desktop.ini
+
+# Skills
+.agents/
+.claude/
+
+# Test files
+python-engine/test_*.py
+
+# Internal design docs (not for public repo)
+.superpowers/
+docs/superpowers/
+imp_docs/
+
+# Fetched at build-time from ggerganov/whisper.cpp/releases.
+binaries/whisper-cpp/
+# Fetched at build-time from gyan.dev/ffmpeg releases.
+binaries/ffmpeg/
+
+# AI-skill tooling metadata
+skills-lock.json

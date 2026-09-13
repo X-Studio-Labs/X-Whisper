@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Security vulnerability
+    url: https://github.com/X-Studio-Labs/X-Whisper/security/advisories/new
+    about: Report privately — please don't open a public issue for security problems.
+  - name: X-Studio
+    url: https://x-studio.live
+    about: Other projects and contact.
