@@ -19,7 +19,8 @@ cd X-Whisper
 npm install
 
 # Bundled binaries (gitignored; fetched per checkout)
-pwsh build/fetch-whisper-cpp.ps1 && pwsh build/fetch-ffmpeg.ps1        # Windows: CPU + CUDA + Vulkan whisper-cli, ffmpeg
+pwsh build/fetch-whisper-cpp.ps1 && pwsh build/fetch-ffmpeg.ps1        # Windows: CPU + CUDA whisper-cli (prebuilt), ffmpeg
+pwsh build/build-whisper-cpp-vulkan.ps1                                 # Windows: Vulkan whisper-cli built from source (upstream ships no Vulkan zip)
 bash build/build-whisper-cpp-metal.sh && bash build/fetch-ffmpeg.sh   # macOS: Metal whisper-cli built from source, ffmpeg
 
 npm run tauri dev

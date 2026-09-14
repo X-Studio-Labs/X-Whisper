@@ -63,7 +63,8 @@ cd X-Whisper
 npm install
 
 # Fetch the whisper.cpp + ffmpeg binaries the app bundles (gitignored, ~350 MB)
-pwsh build/fetch-whisper-cpp.ps1 && pwsh build/fetch-ffmpeg.ps1        # Windows
+pwsh build/fetch-whisper-cpp.ps1 && pwsh build/fetch-ffmpeg.ps1        # Windows: CPU + CUDA, ffmpeg
+pwsh build/build-whisper-cpp-vulkan.ps1                                 # Windows: Vulkan (built from source — needs VS C++ tools, cmake, Vulkan SDK)
 bash build/build-whisper-cpp-metal.sh && bash build/fetch-ffmpeg.sh   # macOS
 
 npm run tauri dev      # dev loop — spawns Vite + the Python engine

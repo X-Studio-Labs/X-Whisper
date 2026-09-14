@@ -10,7 +10,7 @@ Shell is bash on Windows — use Unix syntax, forward-slash paths, `/dev/null`.
 - `npm run dev` — vite only, on port 1420. Rarely useful alone; the UI needs the engine.
 - `npm run build` — `tsc && vite build`, produces `dist/`. There is no lint or test script.
 - `./run_engine.ps1` (Windows) / `bash run_engine.sh` (macOS) — run the Python engine standalone against the managed runtime. `-BootstrapOnly` just sets up the runtime dir; `-Force` re-downloads.
-- Release builds — `pwsh build/fetch-whisper-cpp.ps1 && pwsh build/fetch-ffmpeg.ps1 && npm install && npm run tauri build` on Windows; `bash build/build-whisper-cpp-metal.sh && bash build/fetch-ffmpeg.sh` on macOS. The fetch scripts populate `binaries/` (gitignored) which `tauri.conf.json` / `tauri.macos.conf.json` bundle. `binaries/` must exist or Rust bundling fails.
+- Release builds — `pwsh build/fetch-whisper-cpp.ps1 && pwsh build/fetch-ffmpeg.ps1 && pwsh build/build-whisper-cpp-vulkan.ps1 && npm install && npm run tauri build` on Windows; `bash build/build-whisper-cpp-metal.sh && bash build/fetch-ffmpeg.sh` on macOS. The fetch scripts populate `binaries/` (gitignored) which `tauri.conf.json` / `tauri.macos.conf.json` bundle. `binaries/` must exist or Rust bundling fails. Upstream whisper.cpp ships no Windows Vulkan zip, so `build-whisper-cpp-vulkan.ps1` compiles it from source (needs VS C++ Build Tools, cmake on PATH — run from a VS dev shell — and the LunarG Vulkan SDK with `VULKAN_SDK` set).
 - `cargo check` from `src-tauri/` is the Rust type-check. `tauri-build` verifies that every `bundle.resources` path exists, so `binaries/` must be populated (or stubbed) first.
 
 ## Architecture
