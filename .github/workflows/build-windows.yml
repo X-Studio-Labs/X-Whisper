@@ -11,7 +11,7 @@ on:
 env:
   PYTHON_VERSION: '3.12'
   NODE_VERSION: '20'
-  VULKAN_SDK_VERSION: '1.3.280.0'
+  VULKAN_SDK_VERSION: '1.4.341.1'
   WHISPER_CPP_VERSION: 'v1.8.4'
 
 jobs:
@@ -67,8 +67,10 @@ jobs:
         run: |
           $Version = "${{ env.VULKAN_SDK_VERSION }}"
           $InstallDir = "C:\VulkanSDK\$Version"
-          $Installer = Join-Path $env:TEMP "VulkanSDK-$Version-Installer.exe"
-          $Url = "https://sdk.lunarg.com/sdk/download/$Version/windows/VulkanSDK-$Version-Installer.exe"
+          # LunarG renamed the installer (was VulkanSDK-<ver>-Installer.exe)
+          # and prunes old versions, so keep VULKAN_SDK_VERSION current.
+          $Installer = Join-Path $env:TEMP "vulkansdk-windows-X64-$Version.exe"
+          $Url = "https://sdk.lunarg.com/sdk/download/$Version/windows/vulkansdk-windows-X64-$Version.exe"
           Write-Host "Downloading $Url"
           Invoke-WebRequest -Uri $Url -OutFile $Installer -UseBasicParsing
           Write-Host "Installing to $InstallDir (silent) ..."
