@@ -83,6 +83,20 @@ jobs:
         shell: pwsh
         run: ./build/build-whisper-cpp-vulkan.ps1 -Version ${{ env.WHISPER_CPP_VERSION }}
 
+      # ffmpeg.exe is a bundle.resources entry too (file transcription
+      # probes duration with it). ~100 MB zip, cheap enough to cache.
+      - name: Cache ffmpeg
+        id: cache-ffmpeg
+        uses: actions/cache@v4
+        with:
+          path: binaries/ffmpeg
+          key: ffmpeg-${{ hashFiles('build/fetch-ffmpeg.ps1') }}
+
+      - name: Fetch ffmpeg
+        if: steps.cache-ffmpeg.outputs.cache-hit != 'true'
+        shell: pwsh
+        run: ./build/fetch-ffmpeg.ps1
+
       # --- Tauri build -----------------------------------------------
       # The Python engine ships as source .py files (see
       # tauri.conf.json → bundle.resources), spawned under a managed
