@@ -15,12 +15,19 @@
 #
 # Usage:
 #   powershell -ExecutionPolicy Bypass -File build-whisper-cpp-vulkan.ps1 `
-#       [-Version v1.8.4] [-Force] [-KeepSource]
+#       [-Version v1.8.4] [-Force] [-KeepSource] [-WorkDir C:\xwv]
+#
+# -WorkDir: where to clone + build. Keep it SHORT when the Visual Studio
+# generator is in play -- the nested vulkan-shaders-gen ExternalProject
+# produces paths that exceed MAX_PATH (260) under a default %TEMP%, and
+# MSBuild's FileTracker fails with FTK1011 regardless of the long-paths
+# registry setting. CI passes C:\xwv for this reason.
 
 param(
     [string]$Version = "v1.8.4",
     [switch]$Force,
-    [switch]$KeepSource
+    [switch]$KeepSource,
+    [string]$WorkDir = (Join-Path $env:TEMP "xw-whisper-vulkan-build")
 )
 
 $ErrorActionPreference = "Stop"
@@ -29,7 +36,6 @@ $ProgressPreference = "SilentlyContinue"
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $RepoRoot  = Split-Path -Parent $ScriptDir
 $DestDir   = Join-Path $RepoRoot "binaries\whisper-cpp\vulkan"
-$WorkDir   = Join-Path $env:TEMP "xw-whisper-vulkan-build"
 $SrcDir    = Join-Path $WorkDir "whisper.cpp"
 $BuildDir  = Join-Path $SrcDir "build"
 

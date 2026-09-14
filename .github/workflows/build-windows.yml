@@ -83,7 +83,9 @@ jobs:
       - name: Build Vulkan backend from source
         if: steps.cache-whisper-cpp.outputs.cache-hit != 'true'
         shell: pwsh
-        run: ./build/build-whisper-cpp-vulkan.ps1 -Version ${{ env.WHISPER_CPP_VERSION }}
+        # Short -WorkDir: the VS generator's nested shader-gen build
+        # exceeds MAX_PATH under the runner's %TEMP% (FTK1011).
+        run: ./build/build-whisper-cpp-vulkan.ps1 -Version ${{ env.WHISPER_CPP_VERSION }} -WorkDir C:\xwv
 
       # ffmpeg.exe is a bundle.resources entry too (file transcription
       # probes duration with it). ~100 MB zip, cheap enough to cache.
