@@ -8,6 +8,11 @@ on:
     tags: ['v*']
   workflow_dispatch:
 
+# tauri-action creates the draft release + uploads installers with
+# GITHUB_TOKEN, which is read-only unless we ask for write.
+permissions:
+  contents: write
+
 env:
   PYTHON_VERSION: '3.12'
   NODE_VERSION: '20'
